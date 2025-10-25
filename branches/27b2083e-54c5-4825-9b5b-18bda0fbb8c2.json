@@ -1,0 +1,30 @@
+{
+  "branch_id": "27b2083e-54c5-4825-9b5b-18bda0fbb8c2",
+  "branch_name": "修订分支_第1章",
+  "branch_description": "针对第1章的用户反馈修订: 这是一个测试反馈...",
+  "project_id": null,
+  "base_project_data": {
+    "id": "test-project-123",
+    "title": "测试项目",
+    "genre": "科幻",
+    "chapters": [
+      {
+        "chapter_num": 1,
+        "title": "第一章",
+        "content": "这是一个测试章节的内容",
+        "summary": "第一章摘要"
+      }
+    ],
+    "current_chapter": 1,
+    "feedback": [],
+    "revision_info": {
+      "chapter_num": 1,
+      "feedback": "这是一个测试反馈",
+      "revision_type": "user_feedback"
+    }
+  },
+  "created_at": "2025-10-25T19:10:24.737328",
+  "updated_at": "2025-10-25T19:10:24.737328",
+  "is_active": true,
+  "changes": []
+}

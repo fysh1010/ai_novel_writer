@@ -1,0 +1,136 @@
+# AI小说创作系统配置文件
+
+# 用户反馈设置
+feedback:
+  required: true                    # 是否要求用户反馈
+  show_compliance_details: true     # 是否显示智囊体审查详情
+  auto_replace_sensitive: false     # 是否自动替换敏感词（false=需要确认）
+  emotion_feedback_enabled: true    # 是否启用情感反馈
+
+# 剧情设置
+story:
+  lock_enabled: true               # 是否启用剧情锁定功能
+  intent_analysis_enabled: false   # 【优化】关闭意图分析，直接用用户输入
+  version_backup_enabled: true     # 是否启用版本备份
+  enable_web_search: false         # 是否启用网络搜索真实数据（洪荒、历史等题材）
+  strict_user_input: true          # 是否严格遵循用户输入，不自作主张添加元素
+  skip_conflict_design: true       # 【新增】跳过冲突设计智能体（已修复bug后可考虑重新启用）
+  
+  # 【全新】多选题模式：让智能体提供多个选项
+  multi_option_mode: true          # 启用多选题模式
+  options_count: 2                 # 每个智能体提供的选项数量（2-3个）
+  writer_decides: true             # 让写作智能体自己选择最优方案
+  
+  # 🎯 【质量优先模式】重新启用质量控制机制
+  skip_rhythm_analysis: false      # 保留节奏分析，提升文学性
+  skip_character_check: false      # 🔄 重新启用角色一致性检查
+  skip_plot_check: false           # 🔄 重新启用情节一致性检查
+
+# 智囊体设置
+compliance:
+  show_summary_report: true        # 是否显示摘要报告
+  show_detailed_analysis: true     # 是否显示详细分析
+  auto_correction: true           # 是否自动修正
+  risk_threshold: 70              # 风险阈值（0-100）
+
+# 日志设置
+logging:
+  level: "INFO"                   # 日志级别：DEBUG, INFO, WARN, ERROR
+  show_colors: true              # 是否显示颜色
+  show_timestamps: true          # 是否显示时间戳
+  save_to_file: true            # 是否保存到文件
+
+# 性能设置
+performance:
+  cache_enabled: true            # 是否启用缓存
+  parallel_processing: false     # 是否启用并行处理
+  max_retries: 3                # 最大重试次数
+  timeout_seconds: 60           # 超时时间（秒）
+
+# 输出设置
+output:
+  save_txt_files: true          # 是否保存TXT文件
+  save_json_files: true         # 是否保存JSON文件
+  create_folders_auto: true     # 是否自动创建文件夹
+  typewriter_effect: true       # 是否启用打字机效果
+
+# 模型设置
+models:
+  default_source: "sensenova"   # 默认模型源
+  fallback_enabled: true        # 是否启用备用模型
+  model_rotation: false         # 是否启用模型轮换
+
+# Embedding API配置（Embedding不走LazyLLM框架，需要配置API）
+embedding_api:
+  # 硅基流动Embedding API
+  provider: "siliconflow"  # 使用的embedding服务商
+  siliconflow:
+    api_url: "https://api.siliconflow.cn/v1/embeddings"
+    api_key: "sk-kdumbjnbygltcxncprqaiezhbrdhakpuyhjopiosnbpmtcru"
+    model: "Pro/BAAI/bge-m3"
+  
+  # OpenAI Embedding API（备用）
+  openai:
+    api_url: "https://api.openai.com/v1/embeddings"
+    api_key: ""  # 如需使用，填入OpenAI API密钥
+    model: "text-embedding-3-small"
+
+# Embedding设置（语义向量化）
+embedding:
+  enabled: true                 # 是否启用embedding功能
+  provider: "siliconflow"       # 使用的provider（siliconflow/openai）
+  cache_enabled: true           # 是否启用缓存
+  similarity_threshold: 0.85    # 重复检测阈值
+  consistency_threshold: 0.7    # 一致性检查阈值
+  key_chapters_count: 5         # 识别关键章节数量
+
+# 🚀 智能体模型配置 - 差异化策略（发挥各模型优势）
+# API密钥通过环境变量配置：SENSENOVA_API_KEY
+agent_models:
+  # 故事架构师 - 需要强大的逻辑规划和全局思维能力
+  story_architect:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "逻辑推理能力强，擅长复杂架构设计和系统性思维"
+
+  # 角色管理师 - 需要强大的人物理解和性格分析能力
+  character_manager:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "人物理解深刻，情感分析细腻，擅长角色塑造"
+
+  # 情节控制师 - 需要强大的逻辑推理和因果关系分析
+  plot_controller:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "逻辑严密，擅长因果关系分析和情节连贯性把控"
+
+  # 优化师 - 需要强大的语言润色和文风掌控能力
+  optimizer:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "语言表达优美，文风掌控精准，润色效果出色"
+
+  # 知识库智能体 - 需要强大的信息检索和知识整合能力
+  knowledge_base:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "知识面广，信息整合能力强，适合知识管理"
+
+  # 章节创作 - 🌟 核心功能，需要顶尖的创意写作和情感表达能力
+  chapter_writer:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "创意写作顶尖，情感表达细腻，长文创作流畅自然"
+
+  # 章节修改 - 需要精准理解修改意图和高效执行
+  chapter_modifier:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "理解准确，执行精准，能准确把握修改需求"
+
+  # 合规顾问 - 需要敏感词检测和合规审查能力
+  compliance_advisor:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "理解能力强，审查严谨，适合合规检查"

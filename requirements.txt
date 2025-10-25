@@ -1,0 +1,6 @@
+lazyllm>=0.1.0
+pydantic>=2.0.0
+requests>=2.25.0
+PyYAML>=6.0
+tqdm>=4.62.0
+colorama>=0.4.4
