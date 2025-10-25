@@ -29,6 +29,23 @@
 pip install -r requirements.txt
 ```
 
+### 配置环境变量
+在使用系统之前，需要配置以下环境变量：
+
+```bash
+# 商汤模型API密钥（用于LazyLLM框架调用商汤大模型）
+export SENSENOVA_API_KEY="your_sensenova_api_key_here"
+
+# 向量模型API密钥（用于语义向量化和相似度计算）
+export SILICONFLOW_API_KEY="your_siliconflow_api_key_here"
+```
+
+Windows用户可以使用：
+```cmd
+set SENSENOVA_API_KEY=your_sensenova_api_key_here
+set SILICONFLOW_API_KEY=your_siliconflow_api_key_here
+```
+
 ### 启动系统
 ```bash
 python main.py
@@ -53,41 +70,82 @@ python main.py
 2. 选择菜单选项 `3` 项目管理
 3. 查看项目详情和分支管理
 
-## 📁 项目结构
-
-```
-ai_novel_writer/
-├── agents/                    # 智能体模块
-│   ├── main_controller_agent.py         # 主控智能体
-│   ├── story_architect_simplified.py    # 故事架构师
-│   ├── character_manager_simplified.py  # 人物管理器
-│   ├── plot_controller_simplified.py    # 情节控制器
-│   └── optimizer_agent.py               # 网文优化师
-├── core/                      # 核心组件
-│   ├── branch_manager.py                # 分支管理器
-│   ├── story_dashboard.py               # 故事仪表板
-│   ├── config_manager.py                # 配置管理器
-│   └── enhanced_logger.py               # 增强日志系统
-├── data/                      # 数据资源
-├── projects/                  # 项目存储目录
-├── templates/                 # 模板文件
-├── utils/                     # 工具模块
-├── main.py                    # 主程序入口
-├── project_manager.py         # 项目管理器
-├── README.md                  # 使用说明
-└── requirements.txt           # 依赖包列表
-```
-
 ## ⚙️ 配置说明
 
 ### 模型配置
 在 `config.yaml` 中配置AI模型参数：
 
 ```yaml
+# 模型设置
 models:
-  default: "deepseek-chat"
-  api_key: "your-api-key-here"
-  base_url: "https://api.deepseek.com"
+  default_source: "sensenova"   # 默认模型源（商汤）
+  fallback_enabled: true        # 是否启用备用模型
+  model_rotation: false         # 是否启用模型轮换
+
+# 智能体模型配置 - 差异化策略（发挥各模型优势）
+agent_models:
+  # 故事架构师 - 需要强大的逻辑规划和全局思维能力
+  story_architect:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "逻辑推理能力强，擅长复杂架构设计和系统性思维"
+
+  # 角色管理师 - 需要强大的人物理解和性格分析能力
+  character_manager:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "人物理解深刻，情感分析细腻，擅长角色塑造"
+
+  # 情节控制师 - 需要强大的逻辑推理和因果关系分析
+  plot_controller:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "逻辑严密，擅长因果关系分析和情节连贯性把控"
+
+  # 优化师 - 需要强大的语言润色和文风掌控能力
+  optimizer:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "语言表达优美，文风掌控精准，润色效果出色"
+
+  # 知识库智能体 - 需要强大的信息检索和知识整合能力
+  knowledge_base:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "知识面广，信息整合能力强，适合知识管理"
+
+  # 章节创作 - 核心功能，需要顶尖的创意写作和情感表达能力
+  chapter_writer:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "创意写作顶尖，情感表达细腻，长文创作流畅自然"
+
+  # 章节修改 - 需要精准理解修改意图和高效执行
+  chapter_modifier:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "理解准确，执行精准，能准确把握修改需求"
+
+  # 合规顾问 - 需要敏感词检测和合规审查能力
+  compliance_advisor:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "理解能力强，审查严谨，适合合规检查"
+
+# Embedding API配置（Embedding不走LazyLLM框架，需要配置API）
+embedding_api:
+  # 硅基流动Embedding API
+  provider: "siliconflow"  # 使用的embedding服务商
+  siliconflow:
+    api_url: "https://api.siliconflow.cn/v1/embeddings"
+    api_key: "sk-kdumbjnbygltcxncprqaiezhbrdhakpuyhjopiosnbpmtcru"
+    model: "Pro/BAAI/bge-m3"
+  
+  # OpenAI Embedding API（备用）
+  openai:
+    api_url: "https://api.openai.com/v1/embeddings"
+    api_key: ""  # 如需使用，填入OpenAI API密钥
+    model: "text-embedding-3-small"
 ```
 
 ### 系统配置

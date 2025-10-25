@@ -14,28 +14,91 @@ config.yaml
 
 ### AI模型配置 (models)
 
+系统使用LazyLLM框架调用商汤大模型，模型配置如下：
+
 ```yaml
 models:
-  # 默认模型
-  default: "deepseek-chat"
+  # 默认模型源设置
+  default_source: "sensenova"
   
-  # DeepSeek模型配置
-  deepseek-chat:
-    api_key: "your-api-key-here"
-    base_url: "https://api.deepseek.com"
-    model: "deepseek-chat"
-    temperature: 0.7
-    max_tokens: 2000
-    timeout: 30
+  # 是否启用备用模型
+  fallback_enabled: true
   
-  # Qwen模型配置
-  qwen-chat:
-    api_key: "your-api-key-here"
-    base_url: "https://dashscope.aliyuncs.com/api/v1"
-    model: "qwen-plus"
-    temperature: 0.7
-    max_tokens: 2000
-    timeout: 30
+  # 是否启用模型轮换
+  model_rotation: false
+
+  # 智能体模型配置 - 差异化策略（发挥各模型优势）
+  agent_models:
+    # 故事架构师 - 需要强大的逻辑规划和全局思维能力
+    story_architect:
+      model_source: "sensenova"
+      model_name: "Kimi-K2"
+      reason: "逻辑推理能力强，擅长复杂架构设计和系统性思维"
+
+    # 角色管理师 - 需要强大的人物理解和性格分析能力
+    character_manager:
+      model_source: "sensenova"
+      model_name: "Kimi-K2"
+      reason: "人物理解深刻，情感分析细腻，擅长角色塑造"
+
+    # 情节控制师 - 需要强大的逻辑推理和因果关系分析
+    plot_controller:
+      model_source: "sensenova"
+      model_name: "Kimi-K2"
+      reason: "逻辑严密，擅长因果关系分析和情节连贯性把控"
+
+    # 优化师 - 需要强大的语言润色和文风掌控能力
+    optimizer:
+      model_source: "sensenova"
+      model_name: "Kimi-K2"
+      reason: "语言表达优美，文风掌控精准，润色效果出色"
+
+    # 知识库智能体 - 需要强大的信息检索和知识整合能力
+    knowledge_base:
+      model_source: "sensenova"
+      model_name: "Kimi-K2"
+      reason: "知识面广，信息整合能力强，适合知识管理"
+
+    # 章节创作 - 核心功能，需要顶尖的创意写作和情感表达能力
+    chapter_writer:
+      model_source: "sensenova"
+      model_name: "Kimi-K2"
+      reason: "创意写作顶尖，情感表达细腻，长文创作流畅自然"
+
+    # 章节修改 - 需要精准理解修改意图和高效执行
+    chapter_modifier:
+      model_source: "sensenova"
+      model_name: "Kimi-K2"
+      reason: "理解准确，执行精准，能准确把握修改需求"
+
+    # 合规顾问 - 需要敏感词检测和合规审查能力
+    compliance_advisor:
+      model_source: "sensenova"
+      model_name: "Kimi-K2"
+      reason: "理解能力强，审查严谨，适合合规检查"
+```
+
+### 向量模型配置 (embedding_api)
+
+向量模型使用独立的API调用，不通过LazyLLM框架：
+
+```yaml
+# Embedding API配置（Embedding不走LazyLLM框架，需要配置API）
+embedding_api:
+  # 使用的embedding服务商
+  provider: "siliconflow"
+  
+  # 硅基流动Embedding API
+  siliconflow:
+    api_url: "https://api.siliconflow.cn/v1/embeddings"
+    api_key: "your_siliconflow_api_key_here"  # 通过环境变量配置
+    model: "Pro/BAAI/bge-m3"
+  
+  # OpenAI Embedding API（备用）
+  openai:
+    api_url: "https://api.openai.com/v1/embeddings"
+    api_key: ""  # 如需使用，填入OpenAI API密钥
+    model: "text-embedding-3-small"
 ```
 
 ### 系统配置 (system)
@@ -103,27 +166,45 @@ logging:
     file: "logs/error.log"
 ```
 
+## 🔐 环境变量配置
+
+系统依赖以下环境变量进行认证：
+
+| 环境变量 | 用途 | 说明 |
+|---------|------|------|
+| `SENSENOVA_API_KEY` | 商汤模型API密钥 | 用于LazyLLM框架调用商汤大模型 |
+| `SILICONFLOW_API_KEY` | 硅基流动API密钥 | 用于向量模型API调用 |
+
+设置环境变量的方法：
+
+### Linux/Mac:
+```bash
+export SENSENOVA_API_KEY="your_sensenova_api_key_here"
+export SILICONFLOW_API_KEY="your_siliconflow_api_key_here"
+```
+
+### Windows:
+```cmd
+set SENSENOVA_API_KEY=your_sensenova_api_key_here
+set SILICONFLOW_API_KEY=your_siliconflow_api_key_here
+```
+
 ## 🛠️ 配置修改指南
 
 ### 1. 修改AI模型配置
 
-#### 更换默认模型
+#### 更换默认模型源
 ```yaml
 models:
-  default: "qwen-chat"  # 将默认模型改为Qwen
+  default_source: "sensenova"  # 保持商汤作为默认源
 ```
 
-#### 添加新模型
+#### 调整智能体模型
 ```yaml
-models:
-  # 添加Claude模型
-  claude-chat:
-    api_key: "your-claude-api-key"
-    base_url: "https://api.anthropic.com"
-    model: "claude-3-haiku"
-    temperature: 0.7
-    max_tokens: 2000
-    timeout: 30
+agent_models:
+  story_architect:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"  # 可以更换为其他商汤模型
 ```
 
 ### 2. 调整系统性能
@@ -149,26 +230,15 @@ logging:
     level: "DEBUG"  # 开启调试日志
 ```
 
-## 🔧 环境变量配置
-
-除了配置文件，还可以通过环境变量来配置系统：
-
-| 环境变量 | 说明 | 默认值 |
-|---------|------|--------|
-| `AI_MODEL_API_KEY` | AI模型API密钥 | 无 |
-| `AI_MODEL_BASE_URL` | AI模型基础URL | 无 |
-| `LOG_LEVEL` | 日志级别 | INFO |
-| `PROJECTS_DIR` | 项目存储目录 | projects |
-| `BRANCHES_DIR` | 分支存储目录 | branches |
-
 ## 📊 配置验证
 
 系统启动时会自动验证配置文件的完整性：
 
 1. 检查必需的配置项是否存在
-2. 验证API密钥格式
-3. 验证目录权限
-4. 验证网络连接
+2. 验证环境变量是否设置
+3. 验证API密钥格式
+4. 验证目录权限
+5. 验证网络连接
 
 ## 🔄 配置热更新
 
@@ -183,19 +253,27 @@ logging:
 ### 1. API密钥错误
 ```
 错误信息: Invalid API key
-解决方案: 检查config.yaml中的api_key配置
+解决方案: 
+1. 检查环境变量是否正确设置
+2. 检查config.yaml中的api_key配置
+3. 确认API密钥未过期
 ```
 
 ### 2. 网络连接超时
 ```
 错误信息: Request timeout
-解决方案: 增加system.timeout配置值
+解决方案: 
+1. 增加system.timeout配置值
+2. 检查网络连接
+3. 检查防火墙设置
 ```
 
 ### 3. 目录权限问题
 ```
 错误信息: Permission denied
-解决方案: 检查projects_dir和branches_dir目录权限
+解决方案: 
+1. 检查projects_dir和branches_dir目录权限
+2. 确保程序有读写权限
 ```
 
 ## 📈 性能调优建议
@@ -218,7 +296,8 @@ system:
 ### 3. 模型参数调优
 ```yaml
 models:
-  deepseek-chat:
-    temperature: 0.8  # 增加创造性
-    max_tokens: 3000  # 增加输出长度
+  agent_models:
+    chapter_writer:
+      temperature: 0.8  # 增加创造性
+      max_tokens: 3000  # 增加输出长度
 ```

@@ -23,6 +23,7 @@ ai_novel_writer/
 ├── project_manager.py         # 项目管理器
 ├── README.md                  # 使用说明
 ├── CONFIGURATION.md           # 详细配置文档
+├── DEPLOYMENT_GUIDE.md        # 详细部署指南
 └── requirements.txt           # 依赖包列表
 ```
 
@@ -50,18 +51,60 @@ ai_novel_writer_env\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
-### 3. 配置AI模型
+### 3. 配置环境变量
+
+系统使用LazyLLM框架调用商汤大模型，需要配置以下环境变量：
+
+```bash
+# 商汤模型API密钥（用于LazyLLM框架调用商汤大模型）
+export SENSENOVA_API_KEY="your_sensenova_api_key_here"
+
+# 向量模型API密钥（用于语义向量化和相似度计算）
+export SILICONFLOW_API_KEY="your_siliconflow_api_key_here"
+```
+
+Windows用户可以使用：
+```cmd
+set SENSENOVA_API_KEY=your_sensenova_api_key_here
+set SILICONFLOW_API_KEY=your_siliconflow_api_key_here
+```
+
+### 4. 配置模型参数
 
 编辑 `config.yaml` 文件，配置AI模型参数：
 
 ```yaml
+# 模型设置
 models:
-  default: "deepseek-chat"
-  api_key: "your-api-key-here"
-  base_url: "https://api.deepseek.com"
+  default_source: "sensenova"   # 默认模型源（商汤）
+  fallback_enabled: true        # 是否启用备用模型
+  model_rotation: false         # 是否启用模型轮换
+
+# 智能体模型配置 - 差异化策略（发挥各模型优势）
+agent_models:
+  # 故事架构师 - 需要强大的逻辑规划和全局思维能力
+  story_architect:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "逻辑推理能力强，擅长复杂架构设计和系统性思维"
+
+  # 章节创作 - 核心功能，需要顶尖的创意写作和情感表达能力
+  chapter_writer:
+    model_source: "sensenova"
+    model_name: "Kimi-K2"
+    reason: "创意写作顶尖，情感表达细腻，长文创作流畅自然"
+
+# Embedding API配置（Embedding不走LazyLLM框架，需要配置API）
+embedding_api:
+  # 硅基流动Embedding API
+  provider: "siliconflow"  # 使用的embedding服务商
+  siliconflow:
+    api_url: "https://api.siliconflow.cn/v1/embeddings"
+    api_key: "your_siliconflow_api_key_here"  # 通过环境变量配置
+    model: "Pro/BAAI/bge-m3"
 ```
 
-### 4. 启动系统
+### 5. 启动系统
 
 ```bash
 python main.py
@@ -138,35 +181,34 @@ AI写小说智能体 v5.0
 - 写作统计
 - 章节分析
 
-## ⚙️ 高级配置
+## ⚙️ 模型配置详解
 
-### 模型配置
+### LazyLLM框架配置
 
-支持多种AI模型：
-- DeepSeek系列
-- Qwen系列
-- 其他兼容OpenAI API的模型
+本项目使用LazyLLM框架来统一管理商汤大模型的调用。模型配置位于 `config.yaml` 的 `agent_models` 部分：
 
-### 系统性能调优
+- **模型源**: `sensenova` (商汤)
+- **模型名称**: `Kimi-K2` (或其他商汤模型)
+- **API密钥**: 通过环境变量 `SENSENOVA_API_KEY` 配置
 
-```yaml
-system:
-  max_retries: 3      # 最大重试次数
-  timeout: 30         # 请求超时时间
-  cache:
-    enabled: true     # 启用缓存
-    max_size: 1000    # 缓存最大大小
-    ttl: 86400        # 缓存过期时间（秒）
-```
+### 向量模型配置
 
-### 日志配置
+向量模型使用独立的API调用，不通过LazyLLM框架：
 
-```yaml
-logging:
-  system:
-    level: "INFO"     # 日志级别
-    file: "logs/system.log"  # 日志文件路径
-```
+- **服务提供商**: `siliconflow` (硅基流动)
+- **API URL**: `https://api.siliconflow.cn/v1/embeddings`
+- **模型**: `Pro/BAAI/bge-m3`
+- **API密钥**: 通过环境变量 `SILICONFLOW_API_KEY` 配置
+
+### 智能体差异化配置
+
+系统为每个智能体配置了最适合的模型：
+
+- **故事架构师**: 逻辑推理能力强，擅长复杂架构设计
+- **角色管理器**: 人物理解深刻，情感分析细腻
+- **情节控制器**: 逻辑严密，擅长因果关系分析
+- **网文优化师**: 语言表达优美，文风掌控精准
+- **章节创作**: 创意写作顶尖，情感表达细腻
 
 ## 🐛 故障排除
 
@@ -176,27 +218,28 @@ logging:
 ```
 错误信息: Model call failed
 解决方案: 
-1. 检查API密钥是否正确
+1. 检查环境变量SENSENOVA_API_KEY是否正确设置
 2. 检查网络连接
 3. 检查模型配置
+4. 确认商汤账户有足够余额
 ```
 
-#### 2. 项目加载失败
+#### 2. 向量模型调用失败
+```
+错误信息: Embedding call failed
+解决方案:
+1. 检查环境变量SILICONFLOW_API_KEY是否正确设置
+2. 检查向量模型配置
+3. 确认硅基流动账户有足够余额
+```
+
+#### 3. 项目加载失败
 ```
 错误信息: Project load failed
 解决方案:
 1. 检查项目文件完整性
 2. 检查目录权限
 3. 查看日志文件获取详细信息
-```
-
-#### 3. 缓存问题
-```
-错误信息: Cache error
-解决方案:
-1. 清理缓存文件
-2. 重启系统
-3. 检查磁盘空间
 ```
 
 ### 日志查看
@@ -206,34 +249,18 @@ logging:
 - `user.log` - 用户操作日志
 - `error.log` - 错误日志
 
-## 📈 性能监控
-
-### 系统指标
-
-- **缓存命中率**: 80%+
-- **响应时间**: <30秒（平均）
-- **系统健康度**: 实时监控
-- **Token节约**: 50%+
-
-### 监控日志
-
-系统运行时会显示实时性能指标：
-- 各智能体处理进度
-- 缓存命中情况
-- 性能指标统计
-
 ## 🔒 安全说明
 
 ### 数据安全
 
 - 项目数据本地存储
-- 敏感信息加密处理
+- 敏感信息通过环境变量配置
 - 定期备份建议
 
 ### API密钥安全
 
 - 不要在代码中硬编码密钥
-- 使用环境变量或配置文件
+- 使用环境变量配置API密钥
 - 定期更换密钥
 
 ## 🔄 更新升级
@@ -244,69 +271,11 @@ logging:
 2. 下载新版本代码
 3. 迁移配置文件
 4. 安装新依赖
-5. 测试系统功能
+5. 更新环境变量配置
+6. 测试系统功能
 
 ### 兼容性说明
 
 - 向后兼容项目数据格式
 - 配置文件格式可能变化
 - 智能体接口保持稳定
-
-## 📞 技术支持
-
-### 社区支持
-
-- 提交Issue到GitHub仓库
-- 参与讨论区交流
-
-### 商业支持
-
-- 企业定制开发
-- 技术咨询服务
-- 培训支持服务
-
-## 📄 附录
-
-### 项目数据结构
-
-```
-projects/
-└── {project_id}/
-    ├── project.json            # 项目元数据
-    ├── story_framework.json    # 故事框架
-    ├── characters.json         # 角色设定
-    ├── plot_timeline.json      # 情节时间线
-    ├── chapters.json           # 章节数据
-    ├── {project_name}.txt      # 完整小说内容
-    ├── txt/                   # 分章节TXT文件
-    └── feedback/              # 用户反馈数据
-```
-
-### 分支数据结构
-
-```
-branches/
-└── {branch_id}.json           # 分支数据文件
-```
-
-### 配置文件结构
-
-```yaml
-models:
-  default: "deepseek-chat"
-  api_key: "your-api-key-here"
-  base_url: "https://api.deepseek.com"
-
-system:
-  log_level: "INFO"
-  max_retries: 3
-  timeout: 30
-
-feedback:
-  enable_emotion_feedback: true
-
-logging:
-  system:
-    level: "INFO"
-    file: "logs/system.log"
-```
