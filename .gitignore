@@ -142,7 +142,7 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
-projects/*/
-branches/*/
-logs/*/
+projects/
+branches/
+logs/
 *.log
